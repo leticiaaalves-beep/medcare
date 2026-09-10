@@ -89,7 +89,7 @@ e.nome as especialidades,
 m.valor_consulta
 FROM medicos m
 JOIN especialidades e ON m.especialidade_id = e.id
-ORDER BY m.valor_consulta DESC;
+ORDER BY m.valor_consulta DESCgit
 
 SELECT
 c.id as consultas_id,
@@ -101,7 +101,7 @@ FROM consultas c
 JOIN pacientes p ON c.pacientes_id = p.id
 JOIN medicos m ON c.medicos_id = m.id
 JOIN especialidades e ON m.especialidade_id = e.id
-WHERE p.nome = 'Roberta';
+WHERE p.nome = 'Roberta'
 
 SELECT
     c.id AS consulta_id,
@@ -113,7 +113,24 @@ JOIN pacientes p ON c.pacientes_id = p.id
 JOIN medicos m ON c.medicos_id = m.id
 LEFT JOIN exames_consultas ec ON c.id = ec.consultas_id
 GROUP BY c.id, p.nome, m.nome, m.valor_consulta
-ORDER BY c.id;
+ORDER BY c.id
+
+
+SELECT
+    nome,
+    crm,
+    valor_consulta
+FROM medicos
+WHERE valor_consulta > 300
+
+SELECT
+    e.nome AS especialidade,
+    SUM(m.valor_consulta) AS total_faturado
+FROM consultas c
+JOIN medicos m ON c.medicos_id = m.id
+JOIN especialidades e ON m.especialidade_id = e.id
+WHERE c.status = 'Realizada'
+GROUP BY e.nome
 
 
 
