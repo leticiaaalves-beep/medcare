@@ -66,6 +66,57 @@ INSERT into pacientes(nome, email, cpf, data_nascimento,data_cadastro) VALUES
 
 select * from pacientes
 
+INSERT INTO consultas(medicos_id, pacientes_id,data_hora,status) VALUES
+(1,1,'28-08-2026','Realizada'),
+(1,1,'29-08-2026','Realizada'),
+(2,2,'12-09-2026', 'Agendada'),
+(3,3,'02-09-2026', 'Cancelada')
+
+select * from consultas
+
+ INSERT INTO exames_consultas(consultas_id, nome_exame, valor_exame) VALUES
+(6, 'cardiologia', 250.00),
+(7, 'dermatologia', 200.00),
+(8, 'pediatria', 300.00),
+(9, 'cardiologia', 250.00)
+
+select * from exames_consultas
+
+SELECT
+m.nome as medico,
+m.crm,
+e.nome as especialidades,
+m.valor_consulta
+FROM medicos m
+JOIN especialidades e ON m.especialidade_id = e.id
+ORDER BY m.valor_consulta DESC;
+
+SELECT
+c.id as consultas_id,
+c.data_hora,
+m.nome as medico,
+e.nome as especialidades,
+c.status
+FROM consultas c
+JOIN pacientes p ON c.pacientes_id = p.id
+JOIN medicos m ON c.medicos_id = m.id
+JOIN especialidades e ON m.especialidade_id = e.id
+WHERE p.nome = 'Roberta';
+
+SELECT
+    c.id AS consulta_id,
+    p.nome AS paciente,
+    m.nome AS medico,
+    m.valor_consulta + COALESCE(SUM(ec.valor_exame), 0) AS valor_total
+FROM consultas c
+JOIN pacientes p ON c.pacientes_id = p.id
+JOIN medicos m ON c.medicos_id = m.id
+LEFT JOIN exames_consultas ec ON c.id = ec.consultas_id
+GROUP BY c.id, p.nome, m.nome, m.valor_consulta
+ORDER BY c.id;
+
+
+
 
 
 
