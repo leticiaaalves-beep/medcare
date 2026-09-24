@@ -89,7 +89,7 @@ e.nome as especialidades,
 m.valor_consulta
 FROM medicos m
 JOIN especialidades e ON m.especialidade_id = e.id
-ORDER BY m.valor_consulta DESCgit
+ORDER BY m.valor_consulta DESC
 
 SELECT
 c.id as consultas_id,
@@ -123,6 +123,61 @@ SELECT
 FROM medicos
 WHERE valor_consulta > 300
 
+SELECT
+    e.nome AS especialidade,
+    SUM(m.valor_consulta) AS total_faturado
+FROM consultas c
+JOIN medicos m ON c.medicos_id = m.id
+JOIN especialidades e ON m.especialidade_id = e.id
+WHERE c.status = 'Realizada'
+GROUP BY e.nome
+
+
+CREATE VIEW vw_valor_do_medico as
+SELECT
+m.nome as medico,
+m.crm,
+e.nome as especialidades,
+m.valor_consulta
+FROM medicos m
+JOIN especialidades e ON m.especialidade_id = e.id
+ORDER BY m.valor_consulta DESC
+
+CREATE VIEW vw_consultas_informacoes as
+SELECT
+c.id as consultas_id,
+c.data_hora,
+m.nome as medico,
+e.nome as especialidades,
+c.status
+FROM consultas c
+JOIN pacientes p ON c.pacientes_id = p.id
+JOIN medicos m ON c.medicos_id = m.id
+JOIN especialidades e ON m.especialidade_id = e.id
+WHERE p.nome = 'Roberta'
+
+CREATE VIEW vw_paciente_valortotal as
+SELECT
+    c.id AS consulta_id,
+    p.nome AS paciente,
+    m.nome AS medico,
+    m.valor_consulta + COALESCE(SUM(ec.valor_exame), 0) AS valor_total
+FROM consultas c
+JOIN pacientes p ON c.pacientes_id = p.id
+JOIN medicos m ON c.medicos_id = m.id
+LEFT JOIN exames_consultas ec ON c.id = ec.consultas_id
+GROUP BY c.id, p.nome, m.nome, m.valor_consulta
+ORDER BY c.id
+
+CREATE VIEW vw_valormaior300_consulta as
+SELECT
+    nome,
+    crm,
+    valor_consulta
+FROM medicos
+WHERE valor_consulta > 300
+
+CREATE VIEW cw_consultas_finalizadas as
 SELECT
     e.nome AS especialidade,
     SUM(m.valor_consulta) AS total_faturado
