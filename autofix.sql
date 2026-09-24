@@ -89,7 +89,7 @@ SELECT
 veiculos.placa,
 veiculos.modelo,
 ordens_servico.status,
-mecanicos.nome,
+mecanicos.nome as mecanico,
 clientes.nome,
 ordens_servico.id,
 ordens_servico.data_abertura
@@ -128,4 +128,58 @@ WHERE ordens_servico.status = 'Concluida'
 GROUP BY mecanicos.especialidade
 
 
+CREATE VIEW vw_informacoes_clientes_carro as
+SELECT
+ veiculos.marca,
+ veiculos.modelo,
+ veiculos.placa,
+ clientes.nome,
+ clientes.telefone
+ from veiculos join clientes ON clientes.id = veiculos.clientes_id 
+
+ CREATE VIEW cw_compra_informacoes as
+SELECT
+veiculos.placa,
+veiculos.modelo,
+ordens_servico.status,
+mecanicos.nome as mecanico,
+clientes.nome,
+ordens_servico.id,
+ordens_servico.data_abertura
+
+FROM veiculos join ordens_servico on veiculos.id = ordens_servico.veiculos_id
+JOIN clientes ON clientes.id = veiculos.clientes_id
+JOIN mecanicos on mecanicos.id = ordens_servico.mecanicos_id
+WHERE clientes.nome = 'claudio' order by ordens_servico.data_abertura
+
+CREATE VIEW cw_valor_maodeobra as
+SELECT
+    ordens_servico.id,
+    veiculos.placa,
+    mecanicos.nome,
+    ordens_servico.valor_mao_obra,
+    ordens_servico.valor_mao_obra + COALESCE(SUM(pecas_ordemservico.quantidade * pecas_ordemservico.valor_unitario), 0)
+FROM ordens_servico
+JOIN veiculos ON veiculos.id = ordens_servico.veiculos_id
+JOIN mecanicos ON mecanicos.id = ordens_servico.mecanicos_id
+LEFT JOIN pecas_ordemservico ON pecas_ordemservico.ordemservico_id = ordens_servico.id
+GROUP BY ordens_servico.id, veiculos.placa, mecanicos.nome, ordens_servico.valor_mao_obra
+ORDER BY ordens_servico.id
+
+CREATE VIEW cw_valor_hora as
+SELECT
+    nome,
+    valor_hora
+FROM mecanicos
+WHERE valor_hora > 90.00
+
+CREATE VIEW cw_servico_concluido as
+SELECT
+    mecanicos.especialidade,
+    SUM(ordens_servico.valor_mao_obra)
+FROM mecanicos
+JOIN ordens_servico
+ON mecanicos.id = ordens_servico.mecanicos_id
+WHERE ordens_servico.status = 'Concluida'
+GROUP BY mecanicos.especialidade
 
