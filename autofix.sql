@@ -99,6 +99,33 @@ JOIN clientes ON clientes.id = veiculos.clientes_id
 JOIN mecanicos on mecanicos.id = ordens_servico.mecanicos_id
 WHERE clientes.nome = 'claudio' order by ordens_servico.data_abertura
 
+SELECT
+    ordens_servico.id,
+    veiculos.placa,
+    mecanicos.nome,
+    ordens_servico.valor_mao_obra,
+    ordens_servico.valor_mao_obra + COALESCE(SUM(pecas_ordemservico.quantidade * pecas_ordemservico.valor_unitario), 0)
+FROM ordens_servico
+JOIN veiculos ON veiculos.id = ordens_servico.veiculos_id
+JOIN mecanicos ON mecanicos.id = ordens_servico.mecanicos_id
+LEFT JOIN pecas_ordemservico ON pecas_ordemservico.ordemservico_id = ordens_servico.id
+GROUP BY ordens_servico.id, veiculos.placa, mecanicos.nome, ordens_servico.valor_mao_obra
+ORDER BY ordens_servico.id
+
+SELECT
+    nome,
+    valor_hora
+FROM mecanicos
+WHERE valor_hora > 90.00
+
+SELECT
+    mecanicos.especialidade,
+    SUM(ordens_servico.valor_mao_obra)
+FROM mecanicos
+JOIN ordens_servico
+ON mecanicos.id = ordens_servico.mecanicos_id
+WHERE ordens_servico.status = 'Concluida'
+GROUP BY mecanicos.especialidade
 
 
 
