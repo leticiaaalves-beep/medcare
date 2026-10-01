@@ -123,6 +123,23 @@ and modalidades.disponivel = true
 
 
 
+CREATE VIEW vw_faturamento_medio_plano AS
+SELECT
+    planos.nome AS nome_plano,
+    SUM(itens_matricula.valor_mensal_aplicado * itens_matricula.duracao_meses) AS faturamento_total,
+    AVG(itens_matricula.duracao_meses) AS media_duracao_meses
+FROM planos
+JOIN modalidades
+    ON planos.id = modalidades.planos_id
+JOIN itens_matricula
+    ON modalidades.id = itens_matricula.modalidades_id
+JOIN matriculas
+    ON itens_matricula.matriculas_id = matriculas.id
+WHERE matriculas.status = 'ativa'
+GROUP BY planos.nome;
+
+
+
 
 
 
